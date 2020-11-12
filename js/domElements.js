@@ -4,6 +4,7 @@ class DomElements {
     this.apiService = new ApiService();
 
     this.loadAll();
+    this.addEventToNewTaskForm();
   }
 
   loadAll() {
@@ -22,6 +23,7 @@ class DomElements {
   createTaskElement(task) {
     let taskSectionEl = document.createElement("section");
     taskSectionEl.classList.add("task");
+    taskSectionEl.dataset.id = task.id;
 
     let taskHeaderEl = document.createElement("h2");
     taskHeaderEl.innerText = task.title;
@@ -60,4 +62,25 @@ class DomElements {
 
     this.appEl.appendChild(taskSectionEl);
   }
+
+  addEventToNewTaskForm() {
+    let formEl = document.querySelector("form.new-task");
+    formEl.addEventListener("submit", (event) => {
+      event.preventDefault();
+      let titleEl = event.currentTarget.querySelector("input[name=title]");
+      let descriptionEl = event.currentTarget.querySelector("input[name=description]");
+
+      let task = new Task(titleEl.value, descriptionEl.value, "open");
+      this.apiService.saveTask(
+          task,
+          (savedTask) => {
+            this.createTaskElement(savedTask);
+            titleEl.value = "";
+            descriptionEl.value = "";
+          },
+          (error) => console.log(error)
+      );
+    });
+  }
 }
+
