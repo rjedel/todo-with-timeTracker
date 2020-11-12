@@ -1,17 +1,27 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>To Do</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css"
+          integrity="sha384-PDle/QlgIONtM1aqA2Qemk5gPOE7wFq8+Em+G/hmo5Iq0CCmYZLv3fVRDJ4MMwEA" crossorigin="anonymous">
+    <script src="js/task.js"></script>
+    <script src="js/operation.js"></script>
+    <script src="js/apiService.js"></script>
+    <script src="js/domElements.js"></script>
+    <script src="js/app.js"></script>
 </head>
 <body>
-
-<script src="js/apiService.js"></script>
-<script src="js/task.js"></script>
-<script src="js/operation.js"></script>
-<script src="js/app.js"></script>
+<section>
+    <div class="jumbotron container todo-app">
+        <form class="form-group new-task">
+            <h2>Add new task</h2>
+            <input type="text" class="form-control" name="title" placeholder="Title">
+            <input type="text" class="form-control" name="description" placeholder="Description">
+            <input type="submit" value="Add" class="btn btn-primary"/>
+        </form>
+        <hr>
+    </div>
+</section>
 </body>
 </html>

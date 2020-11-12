@@ -7,3 +7,8 @@ apiService.getTasks(
       console.log(error);
     }
 );
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  new DomElements();
+});
