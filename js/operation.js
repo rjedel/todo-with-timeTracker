@@ -1,5 +1,5 @@
 class Operation {
-  constructor(description, timeSpent, task) {
+  constructor(task, description, timeSpent) {
     this.id = null;
     this.task = task;
     this.description = description;
