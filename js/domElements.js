@@ -7,6 +7,8 @@ class DomElements {
     this.addEventToNewTaskForm();
     this.addEventToShowNewOperationForm();
     this.addEventToSubmitOperationForm();
+    this.addShowAddOperationTime();
+    this.addFinishTaskEvent();
   }
 
   loadAll() {
@@ -176,8 +178,121 @@ class DomElements {
     let operationEl = document.createElement("div");
     operationEl.classList.add("list-group-item", "task-operation");
     operationEl.dataset.id = operation.id;
+    operationEl.dataset.text = operation.description;
+    operationEl.dataset.time = operation.timeSpent;
     operationEl.innerText = operation.description;
     taskOperationsElement.appendChild(operationEl);
+
+    const taskStatus = operationEl.parentElement.dataset.status;
+
+    if (taskStatus === "open") {
+
+      let addTimeManualInput = document.createElement("input");
+      addTimeManualInput.classList.add("float-right", "add-time-input", "d-none");
+      addTimeManualInput.setAttribute("name", "time");
+      addTimeManualInput.setAttribute("placeholder", "Type in spend minutes");
+      operationEl.appendChild(addTimeManualInput);
+
+      let manualTimeButton = document.createElement("a");
+      manualTimeButton.classList.add("btn", "btn-primary", "float-right", "add-time");
+      manualTimeButton.innerText = "Add time";
+      operationEl.appendChild(manualTimeButton);
+
+      let timeSpentEl = document.createElement("span");
+      timeSpentEl.classList.add("badge", "badge-primary", "badge-pill");
+      timeSpentEl.innerText = this.timeSpentToString(operation.timeSpent);
+      operationEl.appendChild(timeSpentEl);
+      if (operation.timeSpent <= 0) {
+        timeSpentEl.classList.add("d-none");
+      }
+    }
+  }
+
+  timeSpentToString(timeSpent) {
+    let hours = Math.floor(timeSpent / 3600);
+    let minutes = Math.floor((timeSpent % 3600) / 60);
+    let seconds = (timeSpent % 3600) % 60;
+
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  addShowAddOperationTime() {
+    document.querySelector("div.todo-app").addEventListener("click", event => {
+      if (event.target.classList.contains("add-time")
+          && !event.target.classList.contains("btn-success")) {
+        event.preventDefault();
+        let element = event.target;
+        element.previousElementSibling.classList.remove("d-none");
+        element.innerText = "Save";
+        element.classList.add("btn-success");
+
+      } else if (event.target.classList.contains("add-time")
+          && event.target.classList.contains("btn-success")) {
+        event.preventDefault();
+        let element = event.target;
+
+        const taskId = element.parentElement.parentElement.parentElement.dataset.id;
+        const operationId = element.parentElement.dataset.id;
+        const timeToAdd = parseInt(element.previousElementSibling.value) * 60;
+
+        const description = element.parentElement.dataset.text;
+        const currentTime = parseInt(element.parentElement.dataset.time);
+
+        const operation = new Operation(description, (currentTime + timeToAdd));
+        operation.id = operationId;
+
+        this.apiService.updateOperation(
+            operation,
+            operationsUpdated => {
+              console.log(operationsUpdated);
+              element.parentElement.dataset.time = operationsUpdated.timeSpent;
+              this.updateOperationTimer(operationsUpdated.timeSpent, element.parentElement);
+            },
+            error => console.log(error)
+        );
+
+        element.previousElementSibling.classList.add("d-none");
+        element.previousElementSibling.value = "";
+        element.innerText = "Add time";
+        element.classList.remove("btn-success");
+      }
+    });
+  }
+
+  updateOperationTimer(time, operationElement) {
+    if (time > 0) {
+      operationElement.querySelector("span.badge").innerText = this.timeSpentToString(time);
+      operationElement.querySelector("span.badge").classList.remove("d-none");
+    } else {
+      operationElement.querySelector("span.badge").innerText = 0;
+      operationElement.querySelector("span.badge").classList.add("d-none");
+    }
+  }
+
+  addFinishTaskEvent() {
+    document.querySelector("div.todo-app").addEventListener("click", event => {
+      if (event.target.classList.contains("close-task")) {
+        event.preventDefault();
+        let element = event.target;
+
+        const taskElem = element.parentElement.parentElement.parentElement;
+        const taskId = taskElem.dataset.id;
+        const taskTitle = taskElem.dataset.title;
+        const taskDescription = taskElem.dataset.description;
+
+        const task = new Task(taskTitle, taskDescription);
+        task.id = taskId;
+        task.status = 'closed';
+
+        this.apiService.updateTask(
+            task,
+            updatedTask => {
+              element.nextElementSibling.classList.add("d-none");
+              element.parentElement.parentElement.parentElement.querySelectorAll(".btn", "input").forEach(el => el.classList.add("d-none"));
+            },
+            error => console.log(error)
+        );
+      }
+    });
   }
 }
-

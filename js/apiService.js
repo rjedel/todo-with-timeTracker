@@ -63,6 +63,31 @@ class ApiService {
         });
   }
 
+  updateTask(task, successCallbackFn, errorCallbackFn) {
+    fetch(this.url + '/api/tasks/' + task.id, {
+      headers: {
+        "Authorization": this.apikey,
+        "Content-Type": "application/json"
+      },
+      method: 'PUT',
+      body: JSON.stringify(task)
+    })
+        .then(response => {
+          return response.json();
+        })
+        .then(responseData => {
+          if (typeof successCallbackFn === 'function') {
+            const newTask = this.createTaskFromResponseData(responseData.data);
+            successCallbackFn(newTask);
+          }
+        })
+        .catch(error => {
+          if (typeof errorCallbackFn === 'function') {
+            errorCallbackFn(error);
+          }
+        });
+  }
+
   createOperationFromResponseData(data) {
     const operation = new Operation(data.description, data.timeSpent);
     if (data.id) operation.id = data.id;
@@ -101,6 +126,31 @@ class ApiService {
         "Content-Type": 'application/json',
       },
       method: "POST",
+      body: JSON.stringify(operation)
+    })
+        .then(response => {
+          return response.json();
+        })
+        .then(responseData => {
+          if (typeof successCallbackFn === 'function') {
+            const operation = this.createOperationFromResponseData(responseData.data);
+            successCallbackFn(operation);
+          }
+        })
+        .catch(error => {
+          if (typeof errorCallbackFn === 'function') {
+            errorCallbackFn(error);
+          }
+        });
+  }
+
+  updateOperation(operation, successCallbackFn, errorCallbackFn) {
+    fetch(this.url + '/api/operations/' + operation.id, {
+      headers: {
+        "Authorization": this.apikey,
+        "Content-Type": "application/json"
+      },
+      method: 'PUT',
       body: JSON.stringify(operation)
     })
         .then(response => {
