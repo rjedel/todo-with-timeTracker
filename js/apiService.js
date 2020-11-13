@@ -22,7 +22,7 @@ class ApiService {
         .then(function (response) {
           return response.json();
         })
-        .then((responseData) => {
+        .then(responseData => {
           if (typeof successCallbackFn === "function") {
             const tasksToProcess = responseData.data;
             const tasks = tasksToProcess.map((element) => {
@@ -31,7 +31,7 @@ class ApiService {
             successCallbackFn(tasks);
           }
         })
-        .catch((error) => {
+        .catch(error => {
           if (typeof errorCallbackFn === "function") {
             errorCallbackFn(error);
           }
@@ -47,16 +47,16 @@ class ApiService {
       method: "POST",
       body: JSON.stringify(task),
     })
-        .then((response) => {
+        .then(response => {
           return response.json();
         })
-        .then((responseData) => {
+        .then(responseData => {
           if (typeof successCallbackFn === "function") {
             const newTask = this.createTaskFromResponseData(responseData.data);
             successCallbackFn(newTask);
           }
         })
-        .catch((error) => {
+        .catch(error => {
           if (typeof errorCallbackFn === "function") {
             errorCallbackFn(error);
           }
@@ -79,7 +79,7 @@ class ApiService {
         .then(response => {
           return response.json();
         })
-        .then((responseData) => {
+        .then(responseData => {
           if (typeof successCallbackFn === "function") {
             const operations = responseData.data.map(element => {
               return this.createOperationFromResponseData(element);
@@ -87,8 +87,33 @@ class ApiService {
             successCallbackFn(operations);
           }
         })
-        .catch((error) => {
+        .catch(error => {
           if (typeof errorCallbackFn === "function") {
+            errorCallbackFn(error);
+          }
+        });
+  }
+
+  addOperationForTask(taskId, operation, successCallbackFn, errorCallbackFn) {
+    fetch(this.url + `/api/tasks/${taskId}/operations`, {
+      headers: {
+        "Authorization": this.apikey,
+        "Content-Type": 'application/json',
+      },
+      method: "POST",
+      body: JSON.stringify(operation)
+    })
+        .then(response => {
+          return response.json();
+        })
+        .then(responseData => {
+          if (typeof successCallbackFn === 'function') {
+            const operation = this.createOperationFromResponseData(responseData.data);
+            successCallbackFn(operation);
+          }
+        })
+        .catch(error => {
+          if (typeof errorCallbackFn === 'function') {
             errorCallbackFn(error);
           }
         });
