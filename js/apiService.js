@@ -62,4 +62,35 @@ class ApiService {
           }
         });
   }
+
+  createOperationFromResponseData(data) {
+    const operation = new Operation(data.description, data.timeSpent);
+    if (data.id) operation.id = data.id;
+    return operation;
+  }
+
+  getOperationsForTask(taskId, successCallbackFn, errorCallbackFn) {
+    fetch(this.url + `/api/tasks/${taskId}/operations`, {
+      headers: {
+        Authorization: this.apikey,
+      },
+      method: "GET",
+    })
+        .then(response => {
+          return response.json();
+        })
+        .then((responseData) => {
+          if (typeof successCallbackFn === "function") {
+            const operations = responseData.data.map(element => {
+              return this.createOperationFromResponseData(element);
+            });
+            successCallbackFn(operations);
+          }
+        })
+        .catch((error) => {
+          if (typeof errorCallbackFn === "function") {
+            errorCallbackFn(error);
+          }
+        });
+  }
 }
